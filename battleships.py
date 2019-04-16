@@ -1,19 +1,19 @@
 from random import randint
 
-from constants import UNKNOWN, HORIZONTAL, HIT, VERTICAL, MISS, SIZE, ALIVE, FLEET
-from helpers import ShipBoard, Board
+from constants import UNKNOWN, HORIZONTAL, VERTICAL, MISS, SIZE, ALIVE, FLEET
+from helpers import ShipBoard, Board, Ship
 from utils import print_board
 
-# player_board = ShipBoard(10)
-# ship = Ship('koko', 3)
-# ship.set_parameters(row=1, col=2, orientation=HORIZONTAL)
-# player_board.add_ship(ship)
+player_board = ShipBoard(10)
+ship = Ship('koko', 5)
+ship.set_parameters(row=0, col=0, orientation=VERTICAL)
+player_board.add_ship(ship)
 #
 # ai_guesses_board = Board(10)
 
 player_status = ALIVE
 player_guesses = Board(SIZE)
-player_board = ShipBoard(SIZE)
+# player_board = ShipBoard(SIZE)
 
 ai_status = ALIVE
 ai_guesses = Board(SIZE)
@@ -25,37 +25,34 @@ def place_ships(board):
         created_ship = board.create_random_ship(ship, FLEET[ship])
         board.add_ship(created_ship)
 
+
 # AI
 # Guesses cell if
 def guess_cell(last_row, last_col, ai_guesses_board):
-    if last_row == UNKNOWN and last_col == UNKNOWN:
-        row_to_check = 0
-        col_to_check = 0
-    else:
-        busy = True
-        while busy:
-            row_to_check = randint(0, SIZE - 1)
-            col_to_check = randint(0, SIZE - 1)
-            busy = not ai_guesses_board.is_cell_water(row_to_check, col_to_check)
+    busy = True
+    while busy:
+        row_to_check = randint(0, SIZE - 1)
+        col_to_check = randint(0, SIZE - 1)
+        busy = not ai_guesses_board.is_cell_water(row_to_check, col_to_check)
     return row_to_check, col_to_check
 
 
 def get_ship_orientation(hit_row, hit_col, ai_guesses_board):
-    orientation = None
+    orientation = UNKNOWN
     if ai_guesses_board.is_cell_hit(hit_row + 1, hit_col):
         orientation = VERTICAL
-    if ai_guesses_board.is_cell_hit(hit_row - 1,hit_col):
+    if ai_guesses_board.is_cell_hit(hit_row - 1, hit_col):
         orientation = VERTICAL
-    if ai_guesses_board.is_cell_hit(hit_row,hit_col + 1):
+    if ai_guesses_board.is_cell_hit(hit_row, hit_col + 1):
         orientation = HORIZONTAL
-    if ai_guesses_board.is_cell_hit(hit_row,hit_col - 1):
+    if ai_guesses_board.is_cell_hit(hit_row, hit_col - 1):
         orientation = HORIZONTAL
     return orientation
 
 
 def guess_cell_after_hit(hit_row, hit_col, ai_guesses_board):
     orientation = get_ship_orientation(hit_row, hit_col, ai_guesses_board)
-    if not orientation:
+    if orientation == UNKNOWN:
         print('This is the first hit')
         guessed_row, guessed_col = guess_cell_no_orientation(hit_row, hit_col, ai_guesses_board)
     else:
@@ -156,8 +153,7 @@ def game():
     print_board(player_board, player_guesses, SIZE)
     print('AI BOARD')
     print_board(ai_board, ai_guesses, SIZE)
-    # while player_status == ALIVE and ai_status == ALIVE:
-    while True:
+    while player_status == ALIVE and ai_status == ALIVE:
         # _row = int(input("Which row?"))
         # _col = int(input("Which column?"))
         #
@@ -186,6 +182,11 @@ def game():
             guessed_row, guessed_col = guess_cell(last_row, last_col, ai_guesses)
         else:
             guessed_row, guessed_col = guess_cell_after_hit(last_hit_row, last_hit_col, ai_guesses)
+            print('HITS', hits)
+            print('HIT ', guessed_row, guessed_col)
+            print('TARGET SHIP', target_ship)
+            print('TARGET SHIP', target_ship.coordinates)
+
         hit = player_board.is_hit(guessed_row, guessed_col, ai_guesses.board)
         while hit:
             last_hit_row = guessed_row
@@ -199,10 +200,12 @@ def game():
             else:
                 is_ship_sunk = target_ship.is_sunk(hits)
                 if is_ship_sunk:
+                    print('Target ship', target_ship)
                     print('SUNK', is_ship_sunk)
                     last_hit_row = UNKNOWN
                     last_hit_col = UNKNOWN
                     hits = []
+                    target_ship = None
 
             if last_hit_row == UNKNOWN:
                 guessed_row, guessed_col = guess_cell(last_row, last_col, ai_guesses)

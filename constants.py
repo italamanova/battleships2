@@ -18,5 +18,5 @@ HORIZONTAL = 1
 UNKNOWN = -1
 
 # available ships
-# FLEET = {'carrier': 5, 'battleship': 4, 'destroyer': 3, 'submarine': 3, 'patrolboat': 2}
-FLEET = {'battleship': 5}
+FLEET = {'carrier': 5, 'battleship': 4, 'destroyer': 3, 'submarine': 3, 'patrolboat': 2}
+# FLEET = {'battleship': 5}

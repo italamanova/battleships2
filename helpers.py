@@ -29,10 +29,9 @@ class Ship:
         self.coordinates = self.set_coordinates()
 
     def is_sunk(self, hits):
-        for coord in self.coordinates:
-            if coord not in hits:
-                return False
+        if not len(set(self.coordinates) - set(hits)):
             return True
+        return False
 
     def __repr__(self):
         return 'Ship %s, size: %s, row: %s, col: %s, orientation: %s\n' % (
@@ -77,16 +76,25 @@ class ShipBoard(Board):
         super().__init__(size)
         self.ships = []
 
+    def get_ship_surroundings(self, ship):
+        surroundings = ship.coordinates[:]
+        for coord in ship.coordinates:
+            if self.is_cell_on_board(coord[0] + 1, coord[1]):
+                surroundings.append((coord[0] + 1, coord[1]))
+            if self.is_cell_on_board(coord[0] - 1, coord[1]):
+                surroundings.append((coord[0] - 1, coord[1]))
+            if self.is_cell_on_board(coord[0], coord[1] + 1):
+                surroundings.append((coord[0], coord[1] + 1))
+            if self.is_cell_on_board(coord[0], coord[1] - 1):
+                surroundings.append((coord[0], coord[1] - 1))
+        return surroundings
+
     def check_ship_overlap(self, ship):
+        surroundings = self.get_ship_surroundings(ship)
         overlap = False
-        if ship.orientation == HORIZONTAL:
-            for cell in range(ship.size):
-                if not self.is_cell_water(ship.row, ship.col + cell):
-                    overlap = True
-        else:
-            for cell in range(ship.size):
-                if not self.is_cell_water(ship.row + cell, ship.col):
-                    overlap = True
+        for cell in surroundings:
+            if not self.is_cell_water(cell[0], cell[1]):
+                overlap = True
         return overlap
 
     def create_random_ship(self, ship_name, ship_size):
