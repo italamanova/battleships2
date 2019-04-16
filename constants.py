@@ -1,16 +1,11 @@
-# gamers statuses
-ALIVE = 0
-DEAD = 1
+# board size
+SIZE = 10
 
 # board signs
 WATER = '_'
 MISS = 'X'
 HIT = '*'
 SHIP = '#'
-SPACE = '0'
-
-# board size
-SIZE = 10
 
 # available orientation
 VERTICAL = 0
@@ -19,4 +14,3 @@ UNKNOWN = -1
 
 # available ships
 FLEET = {'carrier': 5, 'battleship': 4, 'destroyer': 3, 'submarine': 3, 'patrolboat': 2}
-# FLEET = {'battleship': 5}

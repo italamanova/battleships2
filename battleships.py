@@ -1,13 +1,11 @@
 from ai import guess_cell, guess_cell_after_hit
-from constants import UNKNOWN, MISS, SIZE, ALIVE, FLEET, HIT
-from helpers import ShipBoard, Board
+from constants import UNKNOWN, MISS, SIZE, FLEET, HIT
+from structure import ShipBoard, Board
 from utils import print_board
 
-player_status = ALIVE
 player_guesses = Board(SIZE)
 player_board = ShipBoard(SIZE)
 
-ai_status = ALIVE
 ai_guesses = Board(SIZE)
 ai_board = ShipBoard(SIZE)
 
@@ -17,10 +15,15 @@ ai_board = ShipBoard(SIZE)
 
 
 def player_turn(ai_ships_left, player_target_ship, player_hits):
+    """
+    :param ai_ships_left: int
+    :param player_target_ship: Ship
+    :param player_hits: list of made hits
+    """
     _row = int(input("Which row?"))
     _col = int(input("Which column?"))
 
-    # if the guess is not legal
+    # If player chose the wrong cell
     while not player_guesses.is_cell_on_board(_row, _col):
         print("Incorrect input, please try again")
         _row = int(input("Which row?"))
@@ -33,7 +36,7 @@ def player_turn(ai_ships_left, player_target_ship, player_hits):
             print('Hit!')
             player_hits.append((_row, _col))
 
-            # check if any ai ship is sunk
+            # Check if any ai ship is sunk
             if not player_target_ship:
                 player_target_ship = ai_board.get_hit_ship(_row, _col)
             else:
@@ -59,6 +62,14 @@ def player_turn(ai_ships_left, player_target_ship, player_hits):
 
 
 def ai_turn(last_hit_row, last_hit_col, player_ships_left, ai_target_ship, ai_hits):
+    """
+    :param last_hit_row: int
+    :param last_hit_col: int
+    :param player_ships_left: int
+    :param ai_target_ship: Ship
+    :param ai_hits: list of hits made by ai
+    """
+    # If a shoot is in the beginning of the game or
     if last_hit_row == UNKNOWN:
         guessed_row, guessed_col = guess_cell(ai_guesses)
     else:
@@ -102,7 +113,6 @@ def ai_turn(last_hit_row, last_hit_col, player_ships_left, ai_target_ship, ai_hi
 
     print('AI turn')
     print_board(player_board, player_guesses, SIZE)
-    # print('AI BOARD')
 
 
 def game():
@@ -117,8 +127,8 @@ def game():
     player_target_ship = None
     player_hits = []
 
-    player_board.place_ships()
-    ai_board.place_ships()
+    player_board.place_random_ships()
+    ai_board.place_random_ships()
 
     print('Battleships')
     print_board(player_board, player_guesses, SIZE)
