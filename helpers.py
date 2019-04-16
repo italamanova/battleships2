@@ -1,16 +1,38 @@
 from random import randint
 
-from constants import HORIZONTAL, VERTICAL, WATER, SHIP, HIT, MISS
+from constants import WATER, HIT, HORIZONTAL, VERTICAL, SHIP, MISS
 from utils import get_random_row, get_random_col
 
 
 class Ship:
-    def __init__(self, name, size, row=None, col=None, orientation=None):
+    def __init__(self, name, size, row=None, col=None, orientation=None, coordinates=None):
         self.name = name
         self.size = size
         self.row = row
         self.col = col
         self.orientation = orientation
+        self.coordinates = coordinates
+
+    def set_coordinates(self):
+        current_ship_coord = []
+        for i in range(self.size):
+            if self.orientation == HORIZONTAL:
+                current_ship_coord.append((self.row, self.col + i))
+            if self.orientation == VERTICAL:
+                current_ship_coord.append((self.row + i, self.col))
+        return current_ship_coord
+
+    def set_parameters(self, row, col, orientation):
+        self.row = row
+        self.col = col
+        self.orientation = orientation
+        self.coordinates = self.set_coordinates()
+
+    def is_sunk(self, hits):
+        for coord in self.coordinates:
+            if coord not in hits:
+                return False
+            return True
 
     def __repr__(self):
         return 'Ship %s, size: %s, row: %s, col: %s, orientation: %s\n' % (
@@ -40,6 +62,12 @@ class Board:
                 return True
         return False
 
+    def is_cell_hit(self, row, col):
+        if self.is_cell_on_board(row, col):
+            if self.board[row][col] == HIT:
+                return True
+        return False
+
     def __str__(self):
         return str(self.ships)
 
@@ -64,23 +92,18 @@ class ShipBoard(Board):
     def create_random_ship(self, ship_name, ship_size):
         ship = Ship(ship_name, ship_size)
         _orientation = randint(VERTICAL, HORIZONTAL)
-        ship.orientation = _orientation
 
         overlap = True
         while overlap:
             _row = get_random_row(_orientation, ship.size)
             _col = get_random_col(_orientation, ship.size)
-            ship.row = _row
-            ship.col = _col
+            ship.set_parameters(_row, _col, _orientation)
             overlap = self.check_ship_overlap(ship)
         return ship
 
     def create_ship_with_coordinates(self, ship_name, ship_size, row, col, orientation):
         ship = Ship(ship_name, ship_size)
-        ship.orientation = orientation
-
-        ship.row = row
-        ship.col = col
+        ship.set_parameters(row=row, col=col, orientation=orientation)
         overlap = self.check_ship_overlap(ship)
         if not overlap:
             return ship
@@ -105,10 +128,7 @@ class ShipBoard(Board):
             guesses_board[row][col] = MISS
             return False
 
-    def is_ship_sunk(self, hits):
-        # for ship in self.ships:
-        #     if ship.has_cells(hits):
-        print('is_ship_sunk')
-        pass
-
-
+    def get_hit_ship(self, hit_row, hit_col):
+        for ship in self.ships:
+            if (hit_row, hit_col) in ship.coordinates:
+                return ship
