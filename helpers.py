@@ -1,6 +1,6 @@
 from random import randint
 
-from constants import WATER, HIT, HORIZONTAL, VERTICAL, SHIP, MISS
+from constants import WATER, HIT, HORIZONTAL, VERTICAL, SHIP, MISS, FLEET
 from utils import get_random_row, get_random_col
 
 
@@ -126,6 +126,11 @@ class ShipBoard(Board):
         else:
             for cell in range(ship.size):
                 self.board[ship.row + cell][ship.col] = SHIP
+
+    def place_ships(self):
+        for ship in FLEET:
+            created_ship = self.create_random_ship(ship, FLEET[ship])
+            self.add_ship(created_ship)
 
     # Checks is someone hits a cell and adds a sign to the board
     def is_hit(self, row, col, guesses_board):
