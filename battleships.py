@@ -1,23 +1,25 @@
 from random import randint
 
-from constants import UNKNOWN, HORIZONTAL, VERTICAL, MISS, SIZE, ALIVE, FLEET
+from constants import UNKNOWN, HORIZONTAL, VERTICAL, MISS, SIZE, ALIVE, FLEET, HIT
 from helpers import ShipBoard, Board, Ship
 from utils import print_board
 
-player_board = ShipBoard(10)
-ship = Ship('koko', 5)
-ship.set_parameters(row=0, col=0, orientation=VERTICAL)
-player_board.add_ship(ship)
+# player_board = ShipBoard(10)
+# ship = Ship('koko', 5)
+# ship.set_parameters(row=0, col=0, orientation=VERTICAL)
+# player_board.add_ship(ship)
 #
 # ai_guesses_board = Board(10)
 
 player_status = ALIVE
 player_guesses = Board(SIZE)
-# player_board = ShipBoard(SIZE)
+player_board = ShipBoard(SIZE)
 
 ai_status = ALIVE
 ai_guesses = Board(SIZE)
 ai_board = ShipBoard(SIZE)
+
+
 
 
 def place_ships(board):
@@ -143,6 +145,9 @@ def game():
     target_ship = None
     hits = []
 
+    ai_ships_left = len(FLEET)
+    player_ships_left = len(FLEET)
+
     place_ships(player_board)
     place_ships(ai_board)
 
@@ -153,7 +158,7 @@ def game():
     print_board(player_board, player_guesses, SIZE)
     print('AI BOARD')
     print_board(ai_board, ai_guesses, SIZE)
-    while player_status == ALIVE and ai_status == ALIVE:
+    while ai_ships_left and player_ships_left:
         # _row = int(input("Which row?"))
         # _col = int(input("Which column?"))
         #
@@ -163,12 +168,11 @@ def game():
         #     _row = int(input("Which row?"))
         #     _col = int(input("Which column?"))
         #
-        # # if the guess is legal
         # if not ai_board.is_cell_water(_row, _col):
-        #     # ai_board.spots -= 1
-        #     if ai_status == ALIVE:
+        #     if ai_ships_left:
         #         print('Hit!')
         #         player_guesses.board[_row][_col] = HIT
+        #     #     check ship sunk
         #     else:
         #         player_guesses.board[_row][_col] = HIT
         #         print('You win!')
@@ -182,10 +186,6 @@ def game():
             guessed_row, guessed_col = guess_cell(last_row, last_col, ai_guesses)
         else:
             guessed_row, guessed_col = guess_cell_after_hit(last_hit_row, last_hit_col, ai_guesses)
-            print('HITS', hits)
-            print('HIT ', guessed_row, guessed_col)
-            print('TARGET SHIP', target_ship)
-            print('TARGET SHIP', target_ship.coordinates)
 
         hit = player_board.is_hit(guessed_row, guessed_col, ai_guesses.board)
         while hit:
@@ -200,17 +200,21 @@ def game():
             else:
                 is_ship_sunk = target_ship.is_sunk(hits)
                 if is_ship_sunk:
-                    print('Target ship', target_ship)
-                    print('SUNK', is_ship_sunk)
+
                     last_hit_row = UNKNOWN
                     last_hit_col = UNKNOWN
                     hits = []
                     target_ship = None
 
-            if last_hit_row == UNKNOWN:
-                guessed_row, guessed_col = guess_cell(last_row, last_col, ai_guesses)
+                    player_ships_left -= 1
+            if player_ships_left:
+                if last_hit_row == UNKNOWN:
+                    guessed_row, guessed_col = guess_cell(last_row, last_col, ai_guesses)
+                else:
+                    guessed_row, guessed_col = guess_cell_after_hit(last_hit_row, last_hit_col, ai_guesses)
             else:
-                guessed_row, guessed_col = guess_cell_after_hit(last_hit_row, last_hit_col, ai_guesses)
+                print('AI WIN!')
+                break
 
             last_row = guessed_row
             last_col = guessed_col
@@ -222,8 +226,12 @@ def game():
         ai_guesses.board[guessed_row][guessed_col] = MISS
 
         print('----------------')
-        print_board(player_board, ai_guesses, SIZE)
+        print('ME')
+        print_board(player_board, player_guesses, SIZE)
+        print('AI BOARD')
+        print_board(ai_board, ai_guesses, SIZE)
         print('----------------')
+
 
 
 game()
