@@ -128,11 +128,12 @@ class ShipBoard(Board):
 
     def get_ship_surroundings(self, ship):
         """
+        Returns all neighbour cell coordinates for a particular ships.
         Helps to place ships one cell out of each other
         :param ship: Ship
-        :return: list of surrounded cells
+        :return: list of (int, int)
         """
-        surroundings = ship.coordinates[:]
+        surroundings = []
         for coord in ship.coordinates:
             if self.is_cell_on_board(coord[0] + 1, coord[1]):
                 surroundings.append((coord[0] + 1, coord[1]))
@@ -150,7 +151,7 @@ class ShipBoard(Board):
         :param ship: Ship
         :return: bool
         """
-        surroundings = self.get_ship_surroundings(ship)
+        surroundings = self.get_ship_surroundings(ship) + ship.coordinates[:]
         overlap = False
         for cell in surroundings:
             if not self.is_cell_water(cell[0], cell[1]):

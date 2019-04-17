@@ -44,6 +44,7 @@ def player_turn(ai_ships_left, player_target_ship, player_hits):
                 if is_ai_ship_sunk:
                     player_hits = []
                     ai_ships_left -= 1
+                    player_target_ship = None
                     print('AI ship sunk!')
 
             print_board(player_board, player_guesses, SIZE)
@@ -69,10 +70,11 @@ def ai_turn(last_hit_row, last_hit_col, player_ships_left, ai_target_ship, ai_hi
     :param ai_target_ship: Ship
     :param ai_hits: list of hits made by ai
     """
-    # If a shoot is in the beginning of the game or
     if last_hit_row == UNKNOWN:
+        # If a shoot is in the beginning of the game
         guessed_row, guessed_col = guess_cell(ai_guesses)
     else:
+        # If the ship was already hit
         guessed_row, guessed_col = guess_cell_after_hit(last_hit_row, last_hit_col, ai_guesses)
 
     print('\nAI move: (%s, %s)' % (guessed_row, guessed_col))
