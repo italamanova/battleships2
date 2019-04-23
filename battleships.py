@@ -62,6 +62,7 @@ def player_turn(ai_ships_left, player_target_ship, player_hits):
     player_guesses.board[_row][_col] = MISS
 
     print_board(player_board, player_guesses, SIZE)
+    return ai_ships_left
 
 
 def ai_turn(last_hit_row, last_hit_col, player_ships_left, ai_target_ship, ai_hits):
@@ -105,6 +106,8 @@ def ai_turn(last_hit_row, last_hit_col, player_ships_left, ai_target_ship, ai_hi
                 ai_target_ship = None
 
                 player_ships_left -= 1
+                print('INSIDE', player_ships_left)
+
                 print('Player ship sunk!')
         # If there are any other ships
         if player_ships_left:
@@ -125,8 +128,11 @@ def ai_turn(last_hit_row, last_hit_col, player_ships_left, ai_target_ship, ai_hi
     print('AI turn')
     print_board(player_board, player_guesses, SIZE)
 
+    return player_ships_left
+
 
 def game():
+
     # Count of the left ships
     ai_ships_left = len(FLEET)
     player_ships_left = len(FLEET)
@@ -145,14 +151,16 @@ def game():
     player_board.place_random_ships()
     ai_board.place_random_ships()
 
+    print_board(ai_board, ai_guesses, SIZE)
+
     print('Battleships')
     print_board(player_board, player_guesses, SIZE)
 
     while ai_ships_left and player_ships_left:
         # Player turn
-        player_turn(ai_ships_left, player_target_ship, player_hits)
+        ai_ships_left = player_turn(ai_ships_left, player_target_ship, player_hits)
         # AI turn
-        ai_turn(last_hit_row, last_hit_col, player_ships_left, ai_target_ship, ai_hits)
+        player_ships_left = ai_turn(last_hit_row, last_hit_col, player_ships_left, ai_target_ship, ai_hits)
 
 
 if __name__ == "__main__":

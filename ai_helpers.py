@@ -47,10 +47,8 @@ def guess_cell_after_hit(hit_row, hit_col, ai_guesses_board):
     """
     orientation = get_ship_orientation(hit_row, hit_col, ai_guesses_board)
     if orientation == UNKNOWN:
-        print('This is the first hit')
         guessed_row, guessed_col = guess_cell_no_orientation(hit_row, hit_col, ai_guesses_board)
     else:
-        print('There are more than one hit cells')
         if orientation == HORIZONTAL:
             guessed_row, guessed_col = guess_cell_horizontal(hit_row, hit_col, ai_guesses_board)
 
